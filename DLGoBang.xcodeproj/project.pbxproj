@@ -22,6 +22,7 @@
 		123FF48124B3D3470031C419 /* DLGoBangUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 123FF48024B3D3470031C419 /* DLGoBangUITests.swift */; };
 		123FF49324B3D3A20031C419 /* PositionRanking.swift in Sources */ = {isa = PBXBuildFile; fileRef = 123FF49224B3D3A20031C419 /* PositionRanking.swift */; };
 		1258F29124D8A73D000060AB /* UIImageExt.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1258F29024D8A73D000060AB /* UIImageExt.swift */; };
+		1258F29324DA057D000060AB /* MenuScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1258F29224DA057D000060AB /* MenuScene.swift */; };
 		1290CEBA24B680A6005CA084 /* AlgorithmMovement.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1290CEB924B680A6005CA084 /* AlgorithmMovement.swift */; };
 		1290CEBD24B79BCE005CA084 /* AttackRanking.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1290CEBC24B79BCE005CA084 /* AttackRanking.swift */; };
 		12ACDE9B24D0DA0300AD6ABB /* FirebaseAnalytics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 12ACDE9124D0DA0200AD6ABB /* FirebaseAnalytics.framework */; };
@@ -83,6 +84,7 @@
 		123FF48224B3D3470031C419 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		123FF49224B3D3A20031C419 /* PositionRanking.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PositionRanking.swift; sourceTree = "<group>"; };
 		1258F29024D8A73D000060AB /* UIImageExt.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIImageExt.swift; sourceTree = "<group>"; };
+		1258F29224DA057D000060AB /* MenuScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuScene.swift; sourceTree = "<group>"; };
 		1290CEB924B680A6005CA084 /* AlgorithmMovement.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlgorithmMovement.swift; sourceTree = "<group>"; };
 		1290CEBC24B79BCE005CA084 /* AttackRanking.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AttackRanking.swift; sourceTree = "<group>"; };
 		12ACDE9124D0DA0200AD6ABB /* FirebaseAnalytics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = FirebaseAnalytics.framework; sourceTree = "<group>"; };
@@ -234,6 +236,7 @@
 			isa = PBXGroup;
 			children = (
 				123FF46024B3D3450031C419 /* GameScene.swift */,
+				1258F29224DA057D000060AB /* MenuScene.swift */,
 			);
 			path = Scenes;
 			sourceTree = "<group>";
@@ -446,6 +449,7 @@
 				1222AFEB24C25C3C0088BB4F /* UIColorExt.swift in Sources */,
 				1290CEBA24B680A6005CA084 /* AlgorithmMovement.swift in Sources */,
 				12182EAA24D666F700CF7211 /* CGPointExt.swift in Sources */,
+				1258F29324DA057D000060AB /* MenuScene.swift in Sources */,
 				123FF49324B3D3A20031C419 /* PositionRanking.swift in Sources */,
 				1258F29124D8A73D000060AB /* UIImageExt.swift in Sources */,
 			);

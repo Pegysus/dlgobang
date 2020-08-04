@@ -36,6 +36,11 @@ class GameScene: SKScene {
     var pauseButton: SKSpriteNode!
     var instructions: SKSpriteNode!
     var backgroundInstructions: SKSpriteNode!
+    var pausePanel: SKSpriteNode!
+    var resumeButton: SKSpriteNode!
+    var restartButton: SKSpriteNode!
+    var quitButton: SKSpriteNode!
+    var backgroundPause: SKSpriteNode!
     
     // States
     var firstGame = true
@@ -137,10 +142,10 @@ class GameScene: SKScene {
         let node = atPoint(sender.location(in: self.view))
         if(node.name != "help_button" && pressingQuestion) {
             changePressQuestion()
-            unpressPause()
+            unpressHelp()
         } else if(node.name == "help_button" && !pressingQuestion) {
             changePressQuestion()
-            pressPause()
+            pressHelp()
         }
         
         if(!isZoomedIn) { return }
@@ -165,7 +170,7 @@ class GameScene: SKScene {
         
         if(node.name == "help_button" && !isInHelp) {
             changePressQuestion()
-            pressPause()
+            pressHelp()
         }
     }
     
@@ -175,25 +180,29 @@ class GameScene: SKScene {
         let node = atPoint(touch.location(in: self))
         
         var position = touch.location(in: view)
-        print("position \(position)")
-        print("distFromCenter \(distFromCenter)")
+//        print("position \(position)")
+//        print("distFromCenter \(distFromCenter)")
         position = (position-centerPoint)*CGPoint(x: zoomInScale, y: zoomInScale) + centerPoint + CGPoint(x: distFromCenter.x, y: -distFromCenter.y)
-        print("position \(position)")
-        //print(position)
+
         if(isInHelp && node.name == "background_instructions") {
             removeInstructions()
-        } else if(node.name == "play_again") {
-            playAgain()
         } else if(node.name == "help_button" && !isInHelp) {
             changePressQuestion()
-            unpressPause()
+            unpressHelp()
             showInstructions()
         } else if(node.name != "help_button" && pressingQuestion) {
-            print("unpressing")
+            changePause()
+            unpressHelp()
             changePressQuestion()
-            unpressPause()
-        } else if(node.name == "pause_button") {
-            print("pausing game")
+        } else if(isInPause && (node.name == "background_paused" || node.name == "resume_button" || node.name == "quit_button")) {
+            changePause()
+            resumePressed()
+        } else if(isInPause && node.name == "restart_button") {
+            changePause()
+            restartPressed()
+        } else if(node.name == "pause_button" && !isInPause) {
+            changePause()
+            showPaused()
         } else if(!victory && !isInHelp && !isInPause) {
             checkMovement(position: position)
         }
@@ -317,13 +326,13 @@ class GameScene: SKScene {
     
     // SKAction and button presses
     
-    func pressPause() {
+    func pressHelp() {
         helpButton.removeAllActions()
         let pressed = SKAction.resize(toWidth: self.frame.width/8-8, height: self.frame.width/8-8, duration: 0.02)
         helpButton.run(pressed)
     }
     
-    func unpressPause() {
+    func unpressHelp() {
         helpButton.removeAllActions()
         let unpressed = SKAction.resize(toWidth: self.frame.width/8, height: self.frame.width/8, duration: 0.02)
         helpButton.run(unpressed)
@@ -358,10 +367,11 @@ class GameScene: SKScene {
     
     func showInstructions() {
         addInstructionPanel()
+        let wait = SKAction.wait(forDuration: 0.05)
         let move = SKAction.move(by: CGVector(dx: 0, dy: -self.frame.height), duration: 0.8)
-        let fade = SKAction.fadeIn(withDuration: 0.8)
-        instructions.run(move)
-        backgroundInstructions.run(fade)
+        let fade = SKAction.fadeAlpha(to: 0.4, duration: 0.8)
+        instructions.run(SKAction.sequence([wait, move]))
+        backgroundInstructions.run(SKAction.sequence([wait, fade]))
         changeHelp()
     }
     
@@ -371,6 +381,47 @@ class GameScene: SKScene {
         backgroundInstructions.run(fade)
         instructions.run(move, completion: removeInstructionPanel)
         changeHelp()
+    }
+    
+    func showPaused() {
+        addPausedPanel()
+        let move = SKAction.move(by: CGVector(dx: 0, dy: -self.frame.height), duration: 0.8)
+        let fade = SKAction.fadeAlpha(to: 0.4, duration: 0.8)
+        pausePanel.run(move)
+        resumeButton.run(move)
+        restartButton.run(move)
+        quitButton.run(move)
+        backgroundPause.run(fade)
+    }
+    
+    func resumePressed() {
+        let move = SKAction.move(by: CGVector(dx: 0, dy: self.frame.height), duration: 0.8)
+        let fade = SKAction.fadeOut(withDuration: 0.8)
+        backgroundPause.run(fade)
+        resumeButton.run(move)
+        restartButton.run(move)
+        quitButton.run(move)
+        pausePanel.run(move, completion: removePausePanel)
+    }
+    
+    func restartPressed() {
+        let move = SKAction.move(by: CGVector(dx: 0, dy: self.frame.height), duration: 0.8)
+        let fade = SKAction.fadeOut(withDuration: 0.8)
+        backgroundPause.run(fade)
+        resumeButton.run(move)
+        restartButton.run(move)
+        quitButton.run(move)
+        pausePanel.run(move, completion: newScene)
+    }
+    
+    func quitPressed() {
+        let move = SKAction.move(by: CGVector(dx: 0, dy: self.frame.height), duration: 0.8)
+        let fade = SKAction.fadeOut(withDuration: 0.8)
+        backgroundPause.run(fade)
+        resumeButton.run(move)
+        restartButton.run(move)
+        quitButton.run(move)
+        pausePanel.run(move, completion: removePausePanel)
     }
     
     func showPanel() {
@@ -596,7 +647,7 @@ extension GameScene {
         instructions.zPosition = 30.0
         
         backgroundInstructions.name = "background_instructions"
-        backgroundInstructions.alpha = 0.75
+        backgroundInstructions.alpha = 0.01
         backgroundInstructions.zPosition = 27.5
         backgroundInstructions.position = CGPoint(x: self.frame.width/2, y: self.frame.height/2)
         
@@ -607,6 +658,53 @@ extension GameScene {
     func removeInstructionPanel() {
         instructions.removeFromParent()
         backgroundInstructions.removeFromParent()
+    }
+    
+    func addPausedPanel() {
+        pausePanel = SKSpriteNode(imageNamed: "game_paused_panel")
+        resumeButton = SKSpriteNode(imageNamed: "resume_button")
+        restartButton = SKSpriteNode(imageNamed: "restart_button")
+        quitButton = SKSpriteNode(imageNamed: "quit_button")
+        backgroundPause = SKSpriteNode(color: .black, size: self.size)
+        
+        pausePanel.name = "pause_panel"
+        pausePanel.size = CGSize(width: 11*self.frame.width/12, height: 15*(11*self.frame.width/12)/17)
+        pausePanel.position = CGPoint(x: self.frame.width/2, y: 3*self.frame.height/2)
+        pausePanel.zPosition = 30.0
+        
+        resumeButton.name = "resume_button"
+        resumeButton.size = CGSize(width: 4*self.frame.width/5, height: 2*self.frame.width/15)
+        resumeButton.position = CGPoint(x: self.frame.width/2, y: 3*self.frame.height/2-pausePanel.size.height/8+pausePanel.size.height/4.5)
+        resumeButton.zPosition = 35.0
+        
+        restartButton.name = "restart_button"
+        restartButton.size = CGSize(width: 4*self.frame.width/5, height: 2*self.frame.width/15)
+        restartButton.position = CGPoint(x: self.frame.width/2, y: 3*self.frame.height/2-pausePanel.size.height/8)
+        restartButton.zPosition = 35.0
+        
+        quitButton.name = "quit_button"
+        quitButton.size = CGSize(width: 4*self.frame.width/5, height: 2*self.frame.width/15)
+        quitButton.position = CGPoint(x: self.frame.width/2, y: 3*self.frame.height/2-pausePanel.size.height/8-pausePanel.size.height/4.5)
+        quitButton.zPosition = 35.0
+        
+        backgroundPause.name = "background_paused"
+        backgroundPause.alpha = 0.01
+        backgroundPause.zPosition = 27.5
+        backgroundPause.position = CGPoint(x: self.frame.width/2, y: self.frame.height/2)
+        
+        addChild(pausePanel)
+        addChild(resumeButton)
+        addChild(restartButton)
+        addChild(quitButton)
+        addChild(backgroundPause)
+    }
+    
+    func removePausePanel() {
+        pausePanel.removeFromParent()
+        resumeButton.removeFromParent()
+        restartButton.removeFromParent()
+        quitButton.removeFromParent()
+        backgroundPause.removeFromParent()
     }
     
     func addHeader() {
