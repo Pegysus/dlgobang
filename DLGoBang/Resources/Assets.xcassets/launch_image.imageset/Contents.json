@@ -1,15 +1,17 @@
 {
   "images" : [
     {
-      "filename" : "question_button3.png",
+      "filename" : "Default-568@1x.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
     {
+      "filename" : "Default-568@2x.png",
       "idiom" : "universal",
       "scale" : "2x"
     },
     {
+      "filename" : "Default-568@3x.png",
       "idiom" : "universal",
       "scale" : "3x"
     }

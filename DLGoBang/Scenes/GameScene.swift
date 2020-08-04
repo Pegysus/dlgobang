@@ -15,29 +15,43 @@ class GameScene: SKScene {
     
     // Properties
     
+    // Board/Stone properties
     var board: SKSpriteNode!
     var tempStones: [[SKSpriteNode]] = []
     var currentPlace: SKShapeNode!
-    
-    var winnerPlace: [CGPoint] = []
-    var winnerNodes = [SKShapeNode?](repeating: nil, count: 10)
-    var gameOverPanel: SKSpriteNode!
-    var playAgainButton: SKSpriteNode!
-    var winnerLabel: SKLabelNode!
-    var helpButton: SKSpriteNode!
     
     var convertGrid = [[CGPoint]](repeating: [CGPoint](repeating: CGPoint(x: 0, y: 0), count: 19), count: 19)
     var grid = [[Int]](repeating: [Int](repeating: 0, count: 19), count: 19)
     var moves: [(String, Int, Int)] = []
     
+    // Victory Nodes
+    var winnerPlace: [CGPoint] = []
+    var winnerNodes = [SKShapeNode?](repeating: nil, count: 10)
+    var gameOverPanel: SKSpriteNode!
+    var playAgainButton: SKSpriteNode!
+    var winnerLabel: SKLabelNode!
+    
+    // Setting Nodes
+    var helpButton: SKSpriteNode!
+    var pauseButton: SKSpriteNode!
+    var instructions: SKSpriteNode!
+    var backgroundInstructions: SKSpriteNode!
+    
+    // States
     var firstGame = true
     var level = 1
+    var isInHelp = false
+    var isInPause = false
     var isBlackMove = false
     var isWhiteMove = true
     var gameStart = true
     var victory = false
     var victor = ""
+    var pressingPause = false
+    var pressingQuestion = false
+    var pressingPlayAgain = false
     
+    // Camera Nodes
     var cameraNode = SKCameraNode()
     var previousCameraPoint: CGPoint = .zero
     var zoomInScale = 1.0
@@ -45,20 +59,44 @@ class GameScene: SKScene {
     var centerPoint = CGPoint(x: 207, y: 448)
     var distFromCenter: CGPoint = .zero
     
+    // SQLite3
     let id = UUID().uuidString
     let insertStatement = "INSERT INTO GoBangGames(gameID, player, x, y, timestamp) VALUES (?, ?, ?, ?, ?)"
     
+    // FireBase
     var ref: DatabaseReference!
     var stamp: String!
     
     // State Changes
     
     func changePlayerTurn() {
-        if(isBlackMove) {
-            isBlackMove = false; isWhiteMove = true
-        } else {
-            isBlackMove = true; isWhiteMove = false
-        }
+        if(isBlackMove) { isBlackMove = false; isWhiteMove = true }
+        else { isBlackMove = true; isWhiteMove = false }
+    }
+    
+    func changePause() {
+        if(isInPause) { isInPause = false }
+        else { isInPause = true }
+    }
+    
+    func changeHelp() {
+        if(isInHelp) { isInHelp = false }
+        else { isInHelp = true }
+    }
+    
+    func changePressPause() {
+        if(pressingPause) { pressingPause = false }
+        else { pressingPause = true }
+    }
+    
+    func changePressQuestion() {
+        if(pressingQuestion) { pressingQuestion = false }
+        else { pressingQuestion = true }
+    }
+    
+    func changePressPlay() {
+        if(pressingPlayAgain) { pressingPlayAgain = false}
+        else { pressingPlayAgain = true }
     }
     
     func changeVictory(winner: String) {
@@ -96,6 +134,15 @@ class GameScene: SKScene {
     }
     
     @objc func panGestureAction(_ sender: UIPanGestureRecognizer) {
+        let node = atPoint(sender.location(in: self.view))
+        if(node.name != "help_button" && pressingQuestion) {
+            changePressQuestion()
+            unpressPause()
+        } else if(node.name == "help_button" && !pressingQuestion) {
+            changePressQuestion()
+            pressPause()
+        }
+        
         if(!isZoomedIn) { return }
         // If the movement just began, save the first camera position
         if sender.state == .began {
@@ -104,11 +151,22 @@ class GameScene: SKScene {
         // Perform the translation
         let translation = sender.translation(in: self.view)
         let newPosition = CGPoint(
-            x: previousCameraPoint.x + translation.x * -1,
-            y: previousCameraPoint.y + translation.y
+            x: previousCameraPoint.x + (translation.x * -1)/2,
+            y: previousCameraPoint.y + (translation.y)/2
         )
         distFromCenter = newPosition - centerPoint
         cameraNode.position = newPosition
+    }
+    
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        super.touchesBegan(touches, with: event)
+        guard let touch = touches.first else { return }
+        let node = atPoint(touch.location(in: self))
+        
+        if(node.name == "help_button" && !isInHelp) {
+            changePressQuestion()
+            pressPause()
+        }
     }
     
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -122,15 +180,27 @@ class GameScene: SKScene {
         position = (position-centerPoint)*CGPoint(x: zoomInScale, y: zoomInScale) + centerPoint + CGPoint(x: distFromCenter.x, y: -distFromCenter.y)
         print("position \(position)")
         //print(position)
-        if(node.name == "play_again") {
+        if(isInHelp && node.name == "background_instructions") {
+            removeInstructions()
+        } else if(node.name == "play_again") {
             playAgain()
-        } else if(node.name == "help_button") {
-            
-        } else if(!victory) {
+        } else if(node.name == "help_button" && !isInHelp) {
+            changePressQuestion()
+            unpressPause()
+            showInstructions()
+        } else if(node.name != "help_button" && pressingQuestion) {
+            print("unpressing")
+            changePressQuestion()
+            unpressPause()
+        } else if(node.name == "pause_button") {
+            print("pausing game")
+        } else if(!victory && !isInHelp && !isInPause) {
             checkMovement(position: position)
         }
         
     }
+    
+    // Algorithms for black move and database management
     
     func checkMovement(position: CGPoint) {
         for i in 0...18 {
@@ -221,33 +291,6 @@ class GameScene: SKScene {
         return sqrt(pow(pos1.x-pos2.x, 2) + pow(pos1.y-pos2.y, 2))
     }
     
-    func flashHelp() {
-        let wait = SKAction.wait(forDuration: 1.5)
-        let grow1 = SKAction.resize(byWidth: 12, height: 12, duration: 0.4)
-        let grow2 = SKAction.resize(byWidth: 5, height: 5, duration: 0.2)
-        let shrink1 = SKAction.resize(byWidth: -5, height: -5, duration: 0.1)
-        let shrink2 = SKAction.resize(byWidth: -12, height: -12, duration: 0.3)
-        
-        helpButton.run(SKAction.sequence([wait, SKAction.repeat(SKAction.sequence([grow1, grow2, shrink1, shrink2]), count: 3)]))
-    }
-    
-    func zoomIn() {
-        let zoomInAction = SKAction.scale(to: 0.5, duration: 0.7)
-        zoomInScale = 0.5
-        cameraNode.run(zoomInAction)
-        isZoomedIn = true
-    }
-    
-    func zoomOut() {
-        let resetToCenter = SKAction.move(to: centerPoint, duration: 0.7)
-        let zoomInAction = SKAction.scale(to: 1.0, duration: 0.7)
-        zoomInScale = 1.0
-        distFromCenter = .zero
-        cameraNode.run(resetToCenter)
-        cameraNode.run(zoomInAction)
-        isZoomedIn = false
-    }
-    
     func gameOver() {
         storeWinner()
         if(currentPlace != nil) { removeStoneBackground() }
@@ -270,6 +313,64 @@ class GameScene: SKScene {
                 )
             )
         }
+    }
+    
+    // SKAction and button presses
+    
+    func pressPause() {
+        helpButton.removeAllActions()
+        let pressed = SKAction.resize(toWidth: self.frame.width/8-8, height: self.frame.width/8-8, duration: 0.02)
+        helpButton.run(pressed)
+    }
+    
+    func unpressPause() {
+        helpButton.removeAllActions()
+        let unpressed = SKAction.resize(toWidth: self.frame.width/8, height: self.frame.width/8, duration: 0.02)
+        helpButton.run(unpressed)
+    }
+    
+    func zoomIn() {
+        let zoomInAction = SKAction.scale(to: 0.5, duration: 0.7)
+        zoomInScale = 0.5
+        cameraNode.run(zoomInAction)
+        isZoomedIn = true
+    }
+    
+    func zoomOut() {
+        let resetToCenter = SKAction.move(to: centerPoint, duration: 0.7)
+        let zoomInAction = SKAction.scale(to: 1.0, duration: 0.7)
+        zoomInScale = 1.0
+        distFromCenter = .zero
+        cameraNode.run(resetToCenter)
+        cameraNode.run(zoomInAction)
+        isZoomedIn = false
+    }
+    
+    func flashHelp() {
+        let wait = SKAction.wait(forDuration: 1.5)
+        let grow1 = SKAction.resize(byWidth: 12, height: 12, duration: 0.3)
+        let grow2 = SKAction.resize(byWidth: 5, height: 5, duration: 0.1)
+        let shrink1 = SKAction.resize(byWidth: -5, height: -5, duration: 0.05)
+        let shrink2 = SKAction.resize(byWidth: -12, height: -12, duration: 0.2)
+        
+        helpButton.run(SKAction.sequence([wait, SKAction.repeat(SKAction.sequence([grow1, grow2, shrink1, shrink2]), count: 3)]))
+    }
+    
+    func showInstructions() {
+        addInstructionPanel()
+        let move = SKAction.move(by: CGVector(dx: 0, dy: -self.frame.height), duration: 0.8)
+        let fade = SKAction.fadeIn(withDuration: 0.8)
+        instructions.run(move)
+        backgroundInstructions.run(fade)
+        changeHelp()
+    }
+    
+    func removeInstructions() {
+        let move = SKAction.move(by: CGVector(dx: 0, dy: self.frame.height), duration: 0.8)
+        let fade = SKAction.fadeOut(withDuration: 0.8)
+        backgroundInstructions.run(fade)
+        instructions.run(move, completion: removeInstructionPanel)
+        changeHelp()
     }
     
     func showPanel() {
@@ -485,14 +586,37 @@ extension GameScene {
         addChild(winnerLabel)
     }
     
+    func addInstructionPanel() {
+        instructions = SKSpriteNode(imageNamed: "how_to_panel")
+        backgroundInstructions = SKSpriteNode(color: .black, size: self.size)
+        
+        instructions.name = "instructions"
+        instructions.size = CGSize(width: 11*self.frame.width/12, height: 21*(11*self.frame.width/12)/17)
+        instructions.position = CGPoint(x: self.frame.width/2, y: 3*self.frame.height/2)
+        instructions.zPosition = 30.0
+        
+        backgroundInstructions.name = "background_instructions"
+        backgroundInstructions.alpha = 0.75
+        backgroundInstructions.zPosition = 27.5
+        backgroundInstructions.position = CGPoint(x: self.frame.width/2, y: self.frame.height/2)
+        
+        addChild(instructions)
+        addChild(backgroundInstructions)
+    }
+    
+    func removeInstructionPanel() {
+        instructions.removeFromParent()
+        backgroundInstructions.removeFromParent()
+    }
+    
     func addHeader() {
         let header = SKSpriteNode()
         header.size = CGSize(width: self.frame.width, height: self.frame.height/10)
         header.anchorPoint = .zero
         header.position = CGPoint(x: 0, y: 9*self.frame.height/10)
-        header.color = UIColor(rgb: 0x2A4C5C)
+        header.color = UIColor(rgb: 0x314C5B)
         header.zPosition = -15.0
-        header.drawBorder(color: .black, width: 100)
+        header.drawBorder(color: .white, width: 2)
         
         let headerLevel = SKLabelNode(fontNamed: "Thonburi-Bold")
         headerLevel.text = "Level: \(level)"
@@ -500,14 +624,24 @@ extension GameScene {
         headerLevel.fontColor = .white
         headerLevel.position = CGPoint(x: self.frame.width/7, y: 9.2*self.frame.height/10)
         
+//        let image = UIImage.init(systemName: "questionmark.circle")?.withTintColor(UIColor(rgb: 0x76AD94))
+//        let data = image!.pngData()
+//        let newImage = UIImage(data: data!)
+//        let texture = SKTexture(image: newImage!)
         helpButton = SKSpriteNode(imageNamed: "question_button")
         helpButton.name = "help_button"
         helpButton.size = CGSize(width: self.frame.width/8, height: self.frame.width/8)
-        helpButton.position = CGPoint(x: 8*self.frame.width/9, y: 9.35*self.frame.height/10)
+        helpButton.position = CGPoint(x: 13*self.frame.width/14, y: 9.35*self.frame.height/10)
+        
+        pauseButton = SKSpriteNode(imageNamed: "pause_button")
+        pauseButton.name = "pause_button"
+        pauseButton.size = CGSize(width: self.frame.width/8, height: self.frame.width/8)
+        pauseButton.position = CGPoint(x: 13*self.frame.width/14-self.frame.width/8, y: 9.35*self.frame.height/10)
         
         addChild(header)
         addChild(headerLevel)
         addChild(helpButton)
+        addChild(pauseButton)
     }
     
     // repetitive methods
