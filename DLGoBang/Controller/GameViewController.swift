@@ -20,9 +20,10 @@ class GameViewController: UIViewController {
         createDB()
         
         let skView = view as! SKView
-        let scene = GameScene(size: view.bounds.size)
-        scene.level = 1
-        scene.firstGame = true
+//        let scene = GameScene(size: view.bounds.size)
+//        scene.level = 1
+//        scene.firstGame = true
+        let scene = MenuScene(size: view.bounds.size)
         scene.scaleMode = .aspectFit
         scene.size = view.bounds.size
         

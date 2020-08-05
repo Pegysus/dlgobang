@@ -184,7 +184,9 @@ class GameScene: SKScene {
 //        print("distFromCenter \(distFromCenter)")
         position = (position-centerPoint)*CGPoint(x: zoomInScale, y: zoomInScale) + centerPoint + CGPoint(x: distFromCenter.x, y: -distFromCenter.y)
 
-        if(isInHelp && node.name == "background_instructions") {
+        if(node.name == "play_again") {
+            removePanel()
+        } else if(isInHelp && node.name == "background_instructions") {
             removeInstructions()
         } else if(node.name == "help_button" && !isInHelp) {
             changePressQuestion()
@@ -194,9 +196,11 @@ class GameScene: SKScene {
             changePause()
             unpressHelp()
             changePressQuestion()
-        } else if(isInPause && (node.name == "background_paused" || node.name == "resume_button" || node.name == "quit_button")) {
+        } else if(isInPause && (node.name == "background_paused" || node.name == "resume_button")) {
             changePause()
             resumePressed()
+        } else if(isInPause && node.name == "quit_button") {
+            returnToMenu()
         } else if(isInPause && node.name == "restart_button") {
             changePause()
             restartPressed()
@@ -467,6 +471,14 @@ class GameScene: SKScene {
 
         let moveIn = SKTransition.moveIn(with: .left, duration: 0.5)
         view!.presentScene(scene, transition: moveIn)
+    }
+    
+    func returnToMenu() {
+        let scene = MenuScene(size: size)
+        scene.scaleMode = scaleMode
+        
+        let fade = SKTransition.crossFade(withDuration: 0.5)
+        view!.presentScene(scene, transition: fade)
     }
     
     func reset() {
