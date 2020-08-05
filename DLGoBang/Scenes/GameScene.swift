@@ -29,7 +29,9 @@ class GameScene: SKScene {
     var winnerNodes = [SKShapeNode?](repeating: nil, count: 10)
     var gameOverPanel: SKSpriteNode!
     var playAgainButton: SKSpriteNode!
+    var gameOverQuitButton: SKSpriteNode!
     var winnerLabel: SKLabelNode!
+    var backgroundVictory: SKSpriteNode!
     
     // Setting Nodes
     var helpButton: SKSpriteNode!
@@ -132,7 +134,7 @@ class GameScene: SKScene {
     }
     
     @objc func doubleTapped() {
-        print("zooming in")
+//        print("zooming in")
         if(!isZoomedIn) {
             zoomIn()
         } else if(isZoomedIn) {
@@ -148,6 +150,12 @@ class GameScene: SKScene {
         } else if(node.name == "help_button" && !pressingQuestion) {
             changePressQuestion()
             pressHelp()
+        } else if(node.name != "pause_button" && pressingPause) {
+            changePressPause()
+            unpressPause()
+        } else if(node.name == "pause_button" && !pressingQuestion) {
+            changePressPause()
+            pressPause()
         }
         
         if(!isZoomedIn) { return }
@@ -157,10 +165,14 @@ class GameScene: SKScene {
         }
         // Perform the translation
         let translation = sender.translation(in: self.view)
-        let newPosition = CGPoint(
+        var newPosition = CGPoint(
             x: previousCameraPoint.x + (translation.x * -1)/2,
             y: previousCameraPoint.y + (translation.y)/2
         )
+        
+//        print("position before check: \(newPosition)")
+        newPosition = checkPanBounds(point: newPosition)
+//        print("position after check: \(newPosition)")
         distFromCenter = newPosition - centerPoint
         cameraNode.position = newPosition
     }
@@ -170,9 +182,12 @@ class GameScene: SKScene {
         guard let touch = touches.first else { return }
         let node = atPoint(touch.location(in: self))
         
-        if(node.name == "help_button" && !isInHelp) {
+        if(node.name == "help_button" && !isInHelp && !isInPause) {
             changePressQuestion()
             pressHelp()
+        } else if(node.name == "pause_button" && !isInPause && !isInHelp) {
+            changePressPause()
+            pressPause()
         }
     }
     
@@ -188,14 +203,15 @@ class GameScene: SKScene {
 
         if(node.name == "play_again") {
             removePanel()
-        } else if(isInHelp && node.name == "background_instructions") {
+        } else if(node.name == "game_over_quit") {
+            removePanelHomePage()
+        }else if(isInHelp && node.name == "background_instructions") {
             removeInstructions()
         } else if(node.name == "help_button" && !isInHelp) {
             changePressQuestion()
             unpressHelp()
             showInstructions()
         } else if(node.name != "help_button" && pressingQuestion) {
-            changePause()
             unpressHelp()
             changePressQuestion()
         } else if(isInPause && (node.name == "background_paused" || node.name == "resume_button")) {
@@ -208,7 +224,12 @@ class GameScene: SKScene {
             restartPressed()
         } else if(node.name == "pause_button" && !isInPause) {
             changePause()
+            changePressPause()
+            unpressPause()
             showPaused()
+        } else if(node.name != "pause_button" && pressingPause) {
+            changePressPause()
+            unpressPause()
         } else if(!victory && !isInHelp && !isInPause) {
             checkMovement(position: position)
         }
@@ -223,7 +244,7 @@ class GameScene: SKScene {
                 let dist = calcDist(pos1: convertGrid[i][18-j], pos2: position)
                 if(dist <= board.frame.width/36.0 && grid[i][j] == 0 && isWhiteMove) {
                     addStoneWhite(loc: CGPoint(x: i, y: j))
-                    print("white made move: (\(i), \(j))")
+//                    print("white made move: (\(i), \(j))")
                     changePlayerTurn()
                     if(!victory) {
                         computerMakeMove(boardState: grid, whitePlaced: CGPoint(x: i, y: j))
@@ -236,7 +257,7 @@ class GameScene: SKScene {
     func computerMakeMove(boardState: [[Int]], whitePlaced: CGPoint) {
         let move = AlgorithmMovement.sharedInstance.computerMakeMove(boardState: grid, whitePlaced: whitePlaced, gameStart: gameStart, level: level)
         if(gameStart) { gameStart = false }
-        print("black made move: \(move)")
+//        print("black made move: \(move)")
         addStoneBlack(loc: move)
         changePlayerTurn()
     }
@@ -330,6 +351,19 @@ class GameScene: SKScene {
         }
     }
     
+    func checkPanBounds(point: CGPoint) -> CGPoint {
+        var newPoint = point
+//        print("newPoint: \(newPoint)")
+        if(newPoint.x < self.frame.width/4) { newPoint.x = self.frame.width/4 }
+        else if(newPoint.x > 3*self.frame.width/4) { newPoint.x = 3*self.frame.width/4 }
+        
+        if(newPoint.y < self.frame.height/4) { newPoint.y = self.frame.height/4 }
+        else if(newPoint.y > 3*self.frame.height/4) { newPoint.y = 3*self.frame.height/4 }
+        
+//        print("newPoint after check: \(newPoint)")
+        return newPoint
+    }
+    
     // SKAction and button presses
     
     func pressHelp() {
@@ -342,6 +376,18 @@ class GameScene: SKScene {
         helpButton.removeAllActions()
         let unpressed = SKAction.resize(toWidth: self.frame.width/8, height: self.frame.width/8, duration: 0.02)
         helpButton.run(unpressed)
+    }
+    
+    func pressPause() {
+        pauseButton.removeAllActions()
+        let pressed = SKAction.resize(toWidth: self.frame.width/8-8, height: self.frame.width/8-8, duration: 0.02)
+        pauseButton.run(pressed)
+    }
+    
+    func unpressPause() {
+        pauseButton.removeAllActions()
+        let unpressed = SKAction.resize(toWidth: self.frame.width/8, height: self.frame.width/8, duration: 0.02)
+        pauseButton.run(unpressed)
     }
     
     func zoomIn() {
@@ -432,18 +478,34 @@ class GameScene: SKScene {
     
     func showPanel() {
         let move = SKAction.move(by: CGVector(dx: 0, dy: -0.33*(self.frame.height)), duration: 0.8)
+        let fade = SKAction.fadeAlpha(to: 0.25, duration: 0.8)
         playAgainButton.run(SKAction.sequence([SKAction.wait(forDuration: 4.5), move]))
+        gameOverQuitButton.run(SKAction.sequence([SKAction.wait(forDuration: 4.5), move]))
         gameOverPanel.run(SKAction.sequence([SKAction.wait(forDuration: 4.5), move]))
         winnerLabel.run(SKAction.sequence([SKAction.wait(forDuration: 4.5), move]))
+        backgroundVictory.run(SKAction.sequence([SKAction.wait(forDuration: 4.5), fade]))
     }
        
     func removePanel() {
         let moveDown = SKAction.move(by: CGVector(dx: 0, dy: -10), duration: 0.5)
         let moveUp = SKAction.move(by: CGVector(dx: 0, dy: 0.33*(self.frame.height)+10), duration: 0.2)
         let wait = SKAction.wait(forDuration: 0.4)
+        let fade = SKAction.fadeOut(withDuration: 0.7)
         playAgainButton.run(SKAction.sequence([moveDown, moveUp, wait]))
+        gameOverQuitButton.run(SKAction.sequence([moveDown, moveUp, wait]))
         winnerLabel.run(SKAction.sequence([moveDown, moveUp, wait]))
+        backgroundVictory.run(SKAction.sequence([fade, wait]))
         gameOverPanel.run(SKAction.sequence([moveDown, moveUp, wait]), completion: newScene)
+    }
+    
+    func removePanelHomePage() {
+        let moveDown = SKAction.move(by: CGVector(dx: 0, dy: -10), duration: 0.5)
+        let moveUp = SKAction.move(by: CGVector(dx: 0, dy: 0.33*(self.frame.height)+10), duration: 0.2)
+        let wait = SKAction.wait(forDuration: 0.4)
+        playAgainButton.run(SKAction.sequence([moveDown, moveUp, wait]))
+        gameOverQuitButton.run(SKAction.sequence([moveDown, moveUp, wait]))
+        winnerLabel.run(SKAction.sequence([moveDown, moveUp, wait]))
+        gameOverPanel.run(SKAction.sequence([moveDown, moveUp, wait]), completion: returnToMenu)
     }
     
     func cycleFlashBlackMove() {
@@ -460,6 +522,7 @@ class GameScene: SKScene {
     }
     
     func newScene() {
+        removeGameOverPanel()
         let scene = GameScene(size: size)
         scene.scaleMode = scaleMode
 
@@ -476,6 +539,7 @@ class GameScene: SKScene {
     }
     
     func returnToMenu() {
+        removeGameOverPanel()
         let scene = MenuScene(size: size)
         scene.scaleMode = scaleMode
         
@@ -575,9 +639,9 @@ extension GameScene {
         addChild(stone)
         
         storeMove(move: "W", x: Int(loc.x), y: Int(loc.y))
-        print("stone added for white")
+//        print("stone added for white")
         if(checkWin(justPlaced: loc)) {
-            print("white won!")
+//            print("white won!")
             changeVictory(winner: "White")
         }
     }
@@ -596,9 +660,9 @@ extension GameScene {
         cycleFlashBlackMove()
         
         storeMove(move: "B", x: Int(loc.x), y: Int(loc.y))
-        print("stone added for black")
+//        print("stone added for black")
         if(checkWin(justPlaced: loc)) {
-            print("black won!")
+//            print("black won!")
             changeVictory(winner: "Black")
         }
     }
@@ -627,19 +691,31 @@ extension GameScene {
     }
     
     func addGameOverPanel() {
-        gameOverPanel = SKSpriteNode(imageNamed: "game_over_panel")
-        playAgainButton = SKSpriteNode(imageNamed: "play_again")
+        gameOverPanel = SKSpriteNode(imageNamed: "game_over_panel-1")
+        playAgainButton = SKSpriteNode(imageNamed: "play_again_button")
+        gameOverQuitButton = SKSpriteNode(imageNamed: "game_over_quit_button")
+        backgroundVictory = SKSpriteNode(color: .black, size: self.size)
+        winnerLabel = SKLabelNode(fontNamed: "Thonburi-Bold")
         
         gameOverPanel.position = CGPoint(x: self.frame.width/2.0, y: self.frame.height/2.0+0.66*(self.frame.height))
         gameOverPanel.size = CGSize(width: self.frame.width/1.2, height: 0.7 * self.frame.width/1.2)
         gameOverPanel.zPosition = 20.0
         
-        playAgainButton.position = CGPoint(x: gameOverPanel.position.x, y: (self.frame.height/2.0)/1.14+0.66*(self.frame.height))
+        playAgainButton.position = CGPoint(x: self.frame.width/2-4*gameOverPanel.size.width/17, y: (self.frame.height/2.0)/1.17+0.66*(self.frame.height))
         playAgainButton.name = "play_again"
-        playAgainButton.size = CGSize(width: self.frame.width/2.0, height: 0.3 * self.frame.width/2.0)
+        playAgainButton.size = CGSize(width: 7*(self.frame.width/1.2)/17, height: 3*(7*(self.frame.width/1.2)/17)/7)
         playAgainButton.zPosition = 25.0
         
-        winnerLabel = SKLabelNode(fontNamed: "Thonburi-Bold")
+        gameOverQuitButton.position = CGPoint(x: self.frame.width/2+4*gameOverPanel.size.width/17, y: (self.frame.height/2.0)/1.17+0.66*(self.frame.height))
+        gameOverQuitButton.name = "game_over_quit"
+        gameOverQuitButton.size = CGSize(width: 7*(self.frame.width/1.2)/17, height: 3*(7*(self.frame.width/1.2)/17)/7)
+        gameOverQuitButton.zPosition = 25.0
+        
+        backgroundVictory.name = "background_victory"
+        backgroundVictory.alpha = 0.01
+        backgroundVictory.zPosition = 15.0
+        backgroundVictory.position = CGPoint(x: self.frame.width/2, y: self.frame.height/2)
+        
         winnerLabel.text = "\(victor) won!"
         winnerLabel.fontSize = 30
         winnerLabel.fontColor = .white
@@ -648,7 +724,17 @@ extension GameScene {
         
         addChild(gameOverPanel)
         addChild(playAgainButton)
+        addChild(gameOverQuitButton)
+        addChild(backgroundVictory)
         addChild(winnerLabel)
+    }
+    
+    func removeGameOverPanel() {
+        gameOverPanel.removeFromParent()
+        playAgainButton.removeFromParent()
+        gameOverQuitButton.removeFromParent()
+        backgroundVictory.removeFromParent()
+        winnerLabel.removeFromParent()
     }
     
     func addInstructionPanel() {

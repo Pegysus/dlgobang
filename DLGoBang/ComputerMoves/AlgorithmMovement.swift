@@ -108,7 +108,7 @@ class AlgorithmMovement {
                 if(largestChain < Int(PositionRanking.OpenThree)) {
                     largestChain = setupChain
                 }
-                print("Main loop, chain: \(largestChain)")
+//                print("Main loop, chain: \(largestChain)")
             }
             
             var focusPlacement = whitePlaced
@@ -117,7 +117,7 @@ class AlgorithmMovement {
                 largestChain = otherChain
                 changeBlocks(chain: largestChain, move: otherMoves)
             }
-            print("Main loop, chain: \(largestChain)")
+//            print("Main loop, chain: \(largestChain)")
             
             if(largestChain == -1) { // check to see if there is a jump
                 let x = Int(focusPlacement.x), y = Int(focusPlacement.y)
@@ -150,26 +150,26 @@ class AlgorithmMovement {
                     }
                 }
             } else if(largestChain == PositionRanking.FourFour) {
-                print("Main loop, blocking four four")
+//                print("Main loop, blocking four four")
                 possibleMoves = attackOnMove(boardState: boardState, threat: largestChain)
                 if(possibleMoves.count == 0) {
                     possibleMoves = [setupBlock]
                 }
             } else if(largestChain == PositionRanking.FourThree) {
-                print("Main loop, blocking four three")
+//                print("Main loop, blocking four three")
                 possibleMoves = attackOnMove(boardState: boardState, threat: largestChain)
                 if(possibleMoves.count == 0) {
                     possibleMoves = [setupBlock]
                 }
             } else if(largestChain == PositionRanking.ThreeThree) {
-                print("Main loop, blocking three three")
+//                print("Main loop, blocking three three")
                 possibleMoves = attackOnMove(boardState: boardState, threat: largestChain)
                 if(possibleMoves.count == 0) {
                     possibleMoves = [setupBlock]
                 }
             } else if(largestChain == PositionRanking.OpenFour) {  // Game lost, but still attempt to block
                 possibleMoves = attackOnMove(boardState: boardState, threat: largestChain)
-                print("Main loop, Open Four: \(possibleMoves)")
+//                print("Main loop, Open Four: \(possibleMoves)")
                 if(possibleMoves.count == 0) {
                     possibleMoves = block4O
                     if(bestBlock != CGPoint(x: 0, y: 0)) {
@@ -178,7 +178,7 @@ class AlgorithmMovement {
                 }
             } else if(largestChain == PositionRanking.ClosedFour) { // Prevent game lost by blocking 4 pieces
                 possibleMoves = attackOnMove(boardState: boardState, threat: largestChain)
-                print("Main loop, Closed Four: \(possibleMoves)")
+//                print("Main loop, Closed Four: \(possibleMoves)")
                 if(possibleMoves.count == 0) {
                     possibleMoves = block4C
                     if(bestBlock != CGPoint(x: 0, y: 0)) {
