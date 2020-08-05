@@ -3,9 +3,9 @@
 <plist version="1.0">
 <dict>
 	<key>CLIENT_ID</key>
-	<string>690881197445-77cjl5ovf3887sm7tl7mlgprg89iu4fl.apps.googleusercontent.com</string>
+	<string>690881197445-n1q3d16q24ge1ngeb32sj91227gp3u2n.apps.googleusercontent.com</string>
 	<key>REVERSED_CLIENT_ID</key>
-	<string>com.googleusercontent.apps.690881197445-77cjl5ovf3887sm7tl7mlgprg89iu4fl</string>
+	<string>com.googleusercontent.apps.690881197445-n1q3d16q24ge1ngeb32sj91227gp3u2n</string>
 	<key>API_KEY</key>
 	<string>AIzaSyClH8A9TlxVd0f7hmNdPoG5DG1PAs73hFw</string>
 	<key>GCM_SENDER_ID</key>
@@ -13,7 +13,7 @@
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
-	<string>test.DLGoBang</string>
+	<string>net.opendais.dlgobang</string>
 	<key>PROJECT_ID</key>
 	<string>dlgobang</string>
 	<key>STORAGE_BUCKET</key>
@@ -29,7 +29,7 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:690881197445:ios:dc4209b724e47c3c4380ec</string>
+	<string>1:690881197445:ios:4aac85228e582d884380ec</string>
 	<key>DATABASE_URL</key>
 	<string>https://dlgobang.firebaseio.com</string>
 </dict>

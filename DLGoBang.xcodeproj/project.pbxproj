@@ -23,6 +23,7 @@
 		123FF49324B3D3A20031C419 /* PositionRanking.swift in Sources */ = {isa = PBXBuildFile; fileRef = 123FF49224B3D3A20031C419 /* PositionRanking.swift */; };
 		1258F29124D8A73D000060AB /* UIImageExt.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1258F29024D8A73D000060AB /* UIImageExt.swift */; };
 		1258F29324DA057D000060AB /* MenuScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1258F29224DA057D000060AB /* MenuScene.swift */; };
+		1258F29724DA72C8000060AB /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 1258F29624DA72C7000060AB /* GoogleService-Info.plist */; };
 		1290CEBA24B680A6005CA084 /* AlgorithmMovement.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1290CEB924B680A6005CA084 /* AlgorithmMovement.swift */; };
 		1290CEBD24B79BCE005CA084 /* AttackRanking.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1290CEBC24B79BCE005CA084 /* AttackRanking.swift */; };
 		12ACDE9B24D0DA0300AD6ABB /* FirebaseAnalytics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 12ACDE9124D0DA0200AD6ABB /* FirebaseAnalytics.framework */; };
@@ -39,7 +40,6 @@
 		12ACDEAE24D0DF3F00AD6ABB /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 12ACDEAD24D0DF3800AD6ABB /* libz.tbd */; };
 		12ACDEB024D0DF4D00AD6ABB /* libc++.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 12ACDEAF24D0DF4700AD6ABB /* libc++.tbd */; };
 		12C205A024D0E173004F37C3 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 12C2059F24D0E173004F37C3 /* StoreKit.framework */; };
-		12C205A324D0E8B5004F37C3 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 12C205A224D0E8B5004F37C3 /* GoogleService-Info.plist */; };
 		12C205A624D0F76B004F37C3 /* FirebaseDatabase.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 12C205A424D0F76B004F37C3 /* FirebaseDatabase.xcframework */; };
 		12C205A724D0F76B004F37C3 /* leveldb-library.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 12C205A524D0F76B004F37C3 /* leveldb-library.xcframework */; };
 		12C205AA24D0F9E6004F37C3 /* GameStructure.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12C205A924D0F9E6004F37C3 /* GameStructure.swift */; };
@@ -85,6 +85,7 @@
 		123FF49224B3D3A20031C419 /* PositionRanking.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PositionRanking.swift; sourceTree = "<group>"; };
 		1258F29024D8A73D000060AB /* UIImageExt.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIImageExt.swift; sourceTree = "<group>"; };
 		1258F29224DA057D000060AB /* MenuScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuScene.swift; sourceTree = "<group>"; };
+		1258F29624DA72C7000060AB /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		1290CEB924B680A6005CA084 /* AlgorithmMovement.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlgorithmMovement.swift; sourceTree = "<group>"; };
 		1290CEBC24B79BCE005CA084 /* AttackRanking.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AttackRanking.swift; sourceTree = "<group>"; };
 		12ACDE9124D0DA0200AD6ABB /* FirebaseAnalytics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = FirebaseAnalytics.framework; sourceTree = "<group>"; };
@@ -104,7 +105,6 @@
 		12ACDEAF24D0DF4700AD6ABB /* libc++.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = "libc++.tbd"; path = "usr/lib/libc++.tbd"; sourceTree = SDKROOT; };
 		12C2059F24D0E173004F37C3 /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
 		12C205A124D0E1B0004F37C3 /* HeaderFile.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HeaderFile.h; sourceTree = "<group>"; };
-		12C205A224D0E8B5004F37C3 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		12C205A424D0F76B004F37C3 /* FirebaseDatabase.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = FirebaseDatabase.xcframework; sourceTree = "<group>"; };
 		12C205A524D0F76B004F37C3 /* leveldb-library.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = "leveldb-library.xcframework"; sourceTree = "<group>"; };
 		12C205A924D0F9E6004F37C3 /* GameStructure.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameStructure.swift; sourceTree = "<group>"; };
@@ -192,7 +192,7 @@
 				123FF45C24B3D3450031C419 /* GameScene.sks */,
 				123FF45E24B3D3450031C419 /* Actions.sks */,
 				123FF46C24B3D3470031C419 /* Info.plist */,
-				12C205A224D0E8B5004F37C3 /* GoogleService-Info.plist */,
+				1258F29624DA72C7000060AB /* GoogleService-Info.plist */,
 				12ACDDFC24D0D97D00AD6ABB /* Firebase */,
 				12C205A824D0F9D0004F37C3 /* DatabaseCollection */,
 				1222AFE924C25C260088BB4F /* Utils */,
@@ -415,7 +415,7 @@
 				123FF46824B3D3470031C419 /* Assets.xcassets in Resources */,
 				123FF46B24B3D3470031C419 /* LaunchScreen.storyboard in Resources */,
 				123FF45F24B3D3450031C419 /* Actions.sks in Resources */,
-				12C205A324D0E8B5004F37C3 /* GoogleService-Info.plist in Resources */,
+				1258F29724DA72C8000060AB /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -645,7 +645,7 @@
 					"$(OTHER_LDFLAGS)",
 					"-ObjC",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = test.DLGoBang;
+				PRODUCT_BUNDLE_IDENTIFIER = net.opendais.dlgobang;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -678,7 +678,7 @@
 					"$(OTHER_LDFLAGS)",
 					"-ObjC",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = test.DLGoBang;
+				PRODUCT_BUNDLE_IDENTIFIER = net.opendais.dlgobang;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
