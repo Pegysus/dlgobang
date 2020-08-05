@@ -539,7 +539,6 @@ class GameScene: SKScene {
     }
     
     func returnToMenu() {
-        removeGameOverPanel()
         let scene = MenuScene(size: size)
         scene.scaleMode = scaleMode
         
