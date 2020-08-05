@@ -120,6 +120,8 @@ class GameScene: SKScene {
         setupFirebase()
         if(firstGame) { flashHelp() }
         
+        centerPoint = CGPoint(x: self.frame.width/2, y: self.frame.height/2)
+        
         let panGesture = UIPanGestureRecognizer()
         panGesture.addTarget(self, action: #selector(panGestureAction(_:)))
         view.addGestureRecognizer(panGesture)
@@ -350,7 +352,7 @@ class GameScene: SKScene {
     }
     
     func zoomOut() {
-        let resetToCenter = SKAction.move(to: centerPoint, duration: 0.7)
+        let resetToCenter = SKAction.move(to: CGPoint(x: self.frame.width/2, y: self.frame.height/2), duration: 0.7)
         let zoomInAction = SKAction.scale(to: 1.0, duration: 0.7)
         zoomInScale = 1.0
         distFromCenter = .zero

@@ -627,12 +627,6 @@
 				CODE_SIGN_STYLE = Automatic;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(PROJECT_DIR)/DLGoBang/Firebase/Google-Mobile-Ads-SDK",
-					"$(PROJECT_DIR)/DLGoBang/Firebase/GoogleSignIn",
-					"$(PROJECT_DIR)/DLGoBang/Firebase/FirebaseAnalytics",
-					"$(PROJECT_DIR)/DLGoBang/Firebase/FirebasePerformance",
-					"$(PROJECT_DIR)/DLGoBang/Firebase/FirebaseMLVision",
-					"$(PROJECT_DIR)/DLGoBang/Firebase/FirebaseMLModelInterpreter",
 					"$(PROJECT_DIR)/DLGoBang/Firebase",
 				);
 				HEADER_SEARCH_PATHS = "$(PROJECT_DIR)/DLGoBang";
@@ -660,12 +654,6 @@
 				CODE_SIGN_STYLE = Automatic;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(PROJECT_DIR)/DLGoBang/Firebase/Google-Mobile-Ads-SDK",
-					"$(PROJECT_DIR)/DLGoBang/Firebase/GoogleSignIn",
-					"$(PROJECT_DIR)/DLGoBang/Firebase/FirebaseAnalytics",
-					"$(PROJECT_DIR)/DLGoBang/Firebase/FirebasePerformance",
-					"$(PROJECT_DIR)/DLGoBang/Firebase/FirebaseMLVision",
-					"$(PROJECT_DIR)/DLGoBang/Firebase/FirebaseMLModelInterpreter",
 					"$(PROJECT_DIR)/DLGoBang/Firebase",
 				);
 				HEADER_SEARCH_PATHS = "$(PROJECT_DIR)/DLGoBang";
