@@ -477,8 +477,8 @@ class GameScene: SKScene {
     }
     
     func showPanel() {
-        let move = SKAction.move(by: CGVector(dx: 0, dy: -0.33*(self.frame.height)), duration: 0.8)
-        let fade = SKAction.fadeAlpha(to: 0.25, duration: 0.8)
+        let move = SKAction.move(by: CGVector(dx: 0, dy: -0.33*(self.frame.height)), duration: 0.4)
+        let fade = SKAction.fadeAlpha(to: 0.25, duration: 0.4)
         playAgainButton.run(SKAction.sequence([SKAction.wait(forDuration: 4.5), move]))
         gameOverQuitButton.run(SKAction.sequence([SKAction.wait(forDuration: 4.5), move]))
         gameOverPanel.run(SKAction.sequence([SKAction.wait(forDuration: 4.5), move]))
@@ -487,10 +487,10 @@ class GameScene: SKScene {
     }
        
     func removePanel() {
-        let moveDown = SKAction.move(by: CGVector(dx: 0, dy: -10), duration: 0.5)
-        let moveUp = SKAction.move(by: CGVector(dx: 0, dy: 0.33*(self.frame.height)+10), duration: 0.2)
+        let moveDown = SKAction.move(by: CGVector(dx: 0, dy: -10), duration: 0.3)
+        let moveUp = SKAction.move(by: CGVector(dx: 0, dy: 0.33*(self.frame.height)+10), duration: 0.1)
         let wait = SKAction.wait(forDuration: 0.4)
-        let fade = SKAction.fadeOut(withDuration: 0.7)
+        let fade = SKAction.fadeOut(withDuration: 0.4)
         playAgainButton.run(SKAction.sequence([moveDown, moveUp, wait]))
         gameOverQuitButton.run(SKAction.sequence([moveDown, moveUp, wait]))
         winnerLabel.run(SKAction.sequence([moveDown, moveUp, wait]))
