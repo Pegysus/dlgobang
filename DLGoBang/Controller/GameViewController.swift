@@ -18,7 +18,7 @@ class GameViewController: UIViewController {
         super.viewDidLoad()
         
         createDB()
-        
+
         let skView = view as! SKView
 //        let scene = GameScene(size: view.bounds.size)
 //        scene.level = 1

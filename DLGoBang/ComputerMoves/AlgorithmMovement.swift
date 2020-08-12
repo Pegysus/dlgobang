@@ -104,7 +104,7 @@ class AlgorithmMovement {
             // checks the setup and changes threat based on setup
             var (setupBlock, setupChain) = (CGPoint(x: 0, y: 0), -1)
             if(level == 3) {
-                (setupBlock, setupChain) = checkWhiteSetup(boardState: boardState, loc: whitePlaced, threat: largestChain, consec: allChains)
+                (setupBlock, setupChain) = checkWhiteSetup(boardState: boardState, loc: whitePlaced, threat: largestChain, consec: allChains, level: level)
                 if(largestChain < Int(PositionRanking.OpenThree)) {
                     largestChain = setupChain
                 }
@@ -524,25 +524,38 @@ class AlgorithmMovement {
         }
     }
     
-    func checkWhiteSetup(boardState: [[Int]], loc: CGPoint, threat: Int, consec: [Int]) -> (CGPoint, Int) { // returns whether the piece placed setups a strong attack
+    func checkWhiteSetup(boardState: [[Int]], loc: CGPoint, threat: Int, consec: [Int], level: Int) -> (CGPoint, Int) { // returns whether the piece placed setups a strong attack
         var tempState = boardState
         var chain = threat, move = CGPoint(x: 0, y: 0)
         
         if(threat == Int(PositionRanking.OpenThree)) {
-            for i in 0...consec[3]-1 {
-                let point1 = block3O[i]
+            for i in 0 ..< block3O.count {
+                let point = block3O[i]
                 
-                tempState[Int(point1.x)][Int(point1.y)] = 1
-                let fourfour1 = checkFourAndFour(boardState: tempState, loc: point1)
-                if(fourfour1) { move = point1; chain = Int(PositionRanking.FourFour) }
-                let fourthree1 = checkFourAndThree(boardState: tempState, loc: point1)
-                if(fourthree1) { move = point1; chain = Int(PositionRanking.FourThree) }
-                let threethree1 = checkThreeAndThree(boardState: tempState, loc: point1)
-                if(threethree1) { move = point1; chain = Int(PositionRanking.ThreeThree) }
-                tempState[Int(point1.x)][Int(point1.y)] = 0
+                tempState[Int(point.x)][Int(point.y)] = 1
+                let fourfour1 = checkFourAndFour(boardState: tempState, loc: point)
+                if(fourfour1) { move = point; chain = Int(PositionRanking.FourFour) }
+                let fourthree1 = checkFourAndThree(boardState: tempState, loc: point)
+                if(fourthree1) { move = point; chain = Int(PositionRanking.FourThree) }
+                let threethree1 = checkThreeAndThree(boardState: tempState, loc: point)
+                if(threethree1) { move = point; chain = Int(PositionRanking.ThreeThree) }
+                tempState[Int(point.x)][Int(point.y)] = 0
+                
+                if(level == 4) {
+                    let maxi = max(abs(point.x-loc.x), abs(point.y-loc.y))
+                    let dir = (Int((point.x-loc.x)/(maxi)), Int((point.y-loc.y)/(maxi)))
+                    let jumpPoint = CGPoint(x: Int(point.x)+dir.0, y: Int(point.y)+dir.1)
+                    tempState[Int(jumpPoint.x)][Int(jumpPoint.y)] = 1
+    //                print("checking jump setup, open three")
+                    let setup = checkJumpSetup(boardState: tempState, loc: jumpPoint)
+                    if(setup == Int(PositionRanking.FourFour)) { move = point; chain = setup }
+                    else if(setup == Int(PositionRanking.FourThree)) { move = point; chain = setup }
+                    else if(setup == Int(PositionRanking.ThreeThree)) { move = point; chain = setup }
+                    tempState[Int(jumpPoint.x)][Int(jumpPoint.y)] = 0
+                }
             }
         } else if(threat == Int(PositionRanking.ClosedThree) && block3C.count > 0) {
-            for i in 0...consec[2]-1 {
+            for i in 0 ..< block3C.count {
                 let point = block3C[i]
                 
                 tempState[Int(point.x)][Int(point.y)] = 1
@@ -553,34 +566,58 @@ class AlgorithmMovement {
                 let threethree = checkThreeAndThree(boardState: tempState, loc: point)
                 if(threethree) { move = point; chain = Int(PositionRanking.ThreeThree) }
                 tempState[Int(point.x)][Int(point.y)] = 0
+                
+                if(level == 4) {
+                    let maxi = max(abs(point.x-loc.x), abs(point.y-loc.y))
+                    let dir = (Int((point.x-loc.x)/(maxi)), Int((point.y-loc.y)/(maxi)))
+                    let jumpPoint = CGPoint(x: Int(point.x)+dir.0, y: Int(point.y)+dir.1)
+                    tempState[Int(jumpPoint.x)][Int(jumpPoint.y)] = 1
+                    let setup = checkJumpSetup(boardState: tempState, loc: jumpPoint)
+                    if(setup == Int(PositionRanking.FourFour)) { move = point; chain = setup }
+                    else if(setup == Int(PositionRanking.FourThree)) { move = point; chain = setup }
+                    else if(setup == Int(PositionRanking.ThreeThree)) { move = point; chain = setup }
+    //                print("checking jump setup closed three")
+                    tempState[Int(jumpPoint.x)][Int(jumpPoint.y)] = 0
+                }
             }
         } else if(threat == Int(PositionRanking.OpenTwo)) {
-            for i in 0...consec[1]-1 {
-                let point1 = block2O[i]
+            for i in 0 ..< block2O.count {
+                let point = block2O[i]
                 
-                tempState[Int(point1.x)][Int(point1.y)] = 1
-                let fourfour1 = checkFourAndFour(boardState: tempState, loc: point1)
-                if(fourfour1) { move = point1; chain = Int(PositionRanking.FourFour) }
-                let fourthree1 = checkFourAndThree(boardState: tempState, loc: point1)
-                if(fourthree1) { move = point1; chain = Int(PositionRanking.FourThree) }
-                let threethree1 = checkThreeAndThree(boardState: tempState, loc: point1)
-                if(threethree1) { move = point1; chain = Int(PositionRanking.ThreeThree) }
-                tempState[Int(point1.x)][Int(point1.y)] = 0
+                tempState[Int(point.x)][Int(point.y)] = 1
+                let fourfour1 = checkFourAndFour(boardState: tempState, loc: point)
+                if(fourfour1) { move = point; chain = Int(PositionRanking.FourFour) }
+                let fourthree1 = checkFourAndThree(boardState: tempState, loc: point)
+                if(fourthree1) { move = point; chain = Int(PositionRanking.FourThree) }
+                let threethree1 = checkThreeAndThree(boardState: tempState, loc: point)
+                if(threethree1) { move = point; chain = Int(PositionRanking.ThreeThree) }
+                tempState[Int(point.x)][Int(point.y)] = 0
+                
+                if(level == 4) {
+                    let maxi = max(abs(point.x-loc.x), abs(point.y-loc.y))
+                    let dir = (Int((point.x-loc.x)/(maxi)), Int((point.y-loc.y)/(maxi)))
+                    let jumpPoint = CGPoint(x: Int(point.x)+dir.0, y: Int(point.y)+dir.1)
+                    tempState[Int(jumpPoint.x)][Int(jumpPoint.y)] = 1
+                    let setup = checkJumpSetup(boardState: tempState, loc: jumpPoint)
+                    if(setup == Int(PositionRanking.FourFour)) { move = point; chain = setup }
+                    else if(setup == Int(PositionRanking.FourThree)) { move = point; chain = setup }
+                    else if(setup == Int(PositionRanking.ThreeThree)) { move = point; chain = setup }
+    //                print("checking jump setup, open two")
+                    tempState[Int(jumpPoint.x)][Int(jumpPoint.y)] = 0
+                }
             }
         } else if(threat == Int(PositionRanking.ClosedTwo)) {
-            for i in 0...consec[0]-1 {
-                if(i < block2C.count) {
-                    let point = block2C[i]
-                    
-                    tempState[Int(point.x)][Int(point.y)] = 1
-                    let fourfour = checkFourAndFour(boardState: tempState, loc: point)
-                    if(fourfour) { move = point; chain = Int(PositionRanking.FourFour) }
-                    let fourthree = checkFourAndThree(boardState: tempState, loc: point)
-                    if(fourthree) { move = point; chain = Int(PositionRanking.FourThree) }
-                    let threethree = checkThreeAndThree(boardState: tempState, loc: point)
-                    if(threethree) { move = point; chain = Int(PositionRanking.ThreeThree) }
-                    tempState[Int(point.x)][Int(point.y)] = 0
-                }
+            for i in 0 ..< block2C.count {
+                let point = block2C[i]
+                
+                tempState[Int(point.x)][Int(point.y)] = 1
+                let fourfour = checkFourAndFour(boardState: tempState, loc: point)
+                if(fourfour) { move = point; chain = Int(PositionRanking.FourFour) }
+                let fourthree = checkFourAndThree(boardState: tempState, loc: point)
+                if(fourthree) { move = point; chain = Int(PositionRanking.FourThree) }
+                let threethree = checkThreeAndThree(boardState: tempState, loc: point)
+                if(threethree) { move = point; chain = Int(PositionRanking.ThreeThree) }
+                tempState[Int(point.x)][Int(point.y)] = 0
             }
         }
         
@@ -612,7 +649,7 @@ class AlgorithmMovement {
             }
         }
         
-        return (move, chain) // To be implemented
+        return (move, chain)
     }
     
     func checkFourAndFour(boardState: [[Int]], loc: CGPoint) -> Bool {
@@ -622,7 +659,7 @@ class AlgorithmMovement {
             return true
         }
         
-        return false // To be implemented
+        return false
     }
     
     func checkFourAndThree(boardState: [[Int]], loc: CGPoint) -> Bool {
@@ -630,7 +667,7 @@ class AlgorithmMovement {
         if((consec[4] > 0 || consec[5] > 0) && consec[3] > 0) {
             return true
         }
-        return false // To be implemented
+        return false
     }
     
     func checkThreeAndThree(boardState: [[Int]], loc: CGPoint) -> Bool {
@@ -639,7 +676,35 @@ class AlgorithmMovement {
             return true
         }
         
-        return false // To be implemented
+        return false
+    }
+    
+    func checkJumpSetup(boardState: [[Int]], loc: CGPoint) -> Int {
+        var three = 0, four = 0, threat = -1
+        for i in 0...7 {
+            var didJump = false, isOpen = false
+            var x = Int(loc.x)+dirx[i], y = Int(loc.y)+diry[i], count = 1
+            while(boardState[x][y] == 1 || (boardState[x][y] == 0 && !didJump)) {
+                if(boardState[x][y] == 1) { count += 1 }
+                else if(boardState[x][y] == 0 && !didJump) { didJump = true }
+                
+                x += dirx[i]; y += diry[i]
+            }
+            if(boardState[x][y] == 0) { isOpen = true }
+            else if(boardState[x][y] == 2) { isOpen = false }
+            
+            if(count == 3 && isOpen) { three += 1 }
+            else if(count >= 4) { four += 1 }
+        }
+//        print("checkJumpSetup, (\(three), \(four))")
+        if(four >= 2) {
+            threat = Int(PositionRanking.FourFour)
+        } else if(four == 1 && three >= 1) {
+            threat = Int(PositionRanking.FourThree)
+        } else if(three >= 2) {
+            threat = Int(PositionRanking.ThreeThree)
+        }
+        return threat
     }
     
     func checkBlackConsecutive(boardState: [[Int]], loc: CGPoint, isAdding: Bool = true) -> [Int] {
@@ -835,7 +900,7 @@ class AlgorithmMovement {
     func attackOnMove(boardState: [[Int]], threat: Int) -> [CGPoint] {
         var moves: [CGPoint] = []
         var tempState = boardState
-        if(threat == Int(PositionRanking.ClosedFour) || threat == Int(PositionRanking.OpenFour) || threat == Int(PositionRanking.FourFour) || threat == Int(PositionRanking.FourThree) || threat == Int(PositionRanking.ThreeThree)) {
+        if(threat == Int(PositionRanking.ClosedFour) || threat == Int(PositionRanking.OpenFour)) {
             // print("attackOnMove, opponent made 4")
             var bestAttack = -1
             
@@ -854,6 +919,35 @@ class AlgorithmMovement {
                             // print("attackOnMove, found ClosedFour")
                             moves = attack4C
                             bestAttack = Int(AttackRanking.ClosedFour)
+                        }
+                    }
+                    
+                    resetAttacks()
+                }
+            }
+        } else if(threat == Int(PositionRanking.FourFour) || threat == Int(PositionRanking.FourThree) || threat == Int(PositionRanking.ThreeThree)) {
+            // print("attackOnMove, opponent made setup")
+            var bestAttack = -1
+            
+            for i in 0...18 {
+                for j in 0...18 {
+                    if(boardState[i][j] == 2) {
+                        var openings = checkBlackConsecutive(boardState: boardState, loc: CGPoint(x: i, y: j))
+                        openings = checkAllBlackBorders(openings: openings, boardState: boardState, loc: CGPoint(x: i, y: j))
+                        if(openings[5] > 0 && bestAttack < Int(AttackRanking.OpenFour)) {
+                            // print("attackOnMove, found OpenFour, (\(i), \(j))")
+                            moves = attack4O
+                            // print("attackOnMove, moves: \(moves)")
+                            bestAttack = Int(AttackRanking.OpenFour)
+                        }
+                        if(openings[4] > 0 && bestAttack < Int(AttackRanking.ClosedFour)) {
+                            // print("attackOnMove, found ClosedFour")
+                            moves = attack4C
+                            bestAttack = Int(AttackRanking.ClosedFour)
+                        }
+                        if(openings[3] > 0 && bestAttack < Int(AttackRanking.OpenThree)) {
+                            moves = attack3O
+                            bestAttack = Int(AttackRanking.OpenThree)
                         }
                     }
                     

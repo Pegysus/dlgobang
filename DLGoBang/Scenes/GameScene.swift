@@ -317,7 +317,12 @@ class GameScene: SKScene {
             curMoveRef.setValue(["player": move.player, "x": move.x, "y": move.y])
         }
         
-        let winner = victor
+        var winner = victor
+        if(winner == "White") {
+            winner = "Black"
+        } else if(winner == "Black") {
+            winner = "White"
+        }
         
         let winnerRef = ref.child("victor")
         winnerRef.setValue(winner)
@@ -345,7 +350,7 @@ class GameScene: SKScene {
         for i in 0 ..< winnerPlace.count {
             winnerNodes[i]!.run(
                 SKAction.sequence(
-                    [wait, SKAction.repeat(SKAction.sequence([fadeIn, fadeOut]), count: 3), fadeIn]
+                    [wait, SKAction.repeat(SKAction.sequence([fadeIn, fadeOut]), count: 2), fadeIn]
                 )
             )
         }
@@ -479,11 +484,11 @@ class GameScene: SKScene {
     func showPanel() {
         let move = SKAction.move(by: CGVector(dx: 0, dy: -0.33*(self.frame.height)), duration: 0.4)
         let fade = SKAction.fadeAlpha(to: 0.25, duration: 0.4)
-        playAgainButton.run(SKAction.sequence([SKAction.wait(forDuration: 4.5), move]))
-        gameOverQuitButton.run(SKAction.sequence([SKAction.wait(forDuration: 4.5), move]))
-        gameOverPanel.run(SKAction.sequence([SKAction.wait(forDuration: 4.5), move]))
-        winnerLabel.run(SKAction.sequence([SKAction.wait(forDuration: 4.5), move]))
-        backgroundVictory.run(SKAction.sequence([SKAction.wait(forDuration: 4.5), fade]))
+        playAgainButton.run(SKAction.sequence([SKAction.wait(forDuration: 3.5), move]))
+        gameOverQuitButton.run(SKAction.sequence([SKAction.wait(forDuration: 3.5), move]))
+        gameOverPanel.run(SKAction.sequence([SKAction.wait(forDuration: 3.5), move]))
+        winnerLabel.run(SKAction.sequence([SKAction.wait(forDuration: 3.5), move]))
+        backgroundVictory.run(SKAction.sequence([SKAction.wait(forDuration: 3.5), fade]))
     }
        
     func removePanel() {
@@ -526,9 +531,9 @@ class GameScene: SKScene {
         scene.scaleMode = scaleMode
 
         scene.firstGame = false
-        if(victor == "White") {
+        if(victor == "Black") {
             scene.level = level+1
-            if(scene.level > 3) { scene.level = 3 }
+            if(scene.level > 4) { scene.level = 4 }
         } else {
             scene.level = level
         }
@@ -628,8 +633,8 @@ extension GameScene {
     }
     
     func addStoneWhite(loc: CGPoint) {
-        let stone = SKSpriteNode(imageNamed: "gomoku_stone_white")
-        stone.name = "WhiteStone"
+        let stone = SKSpriteNode(imageNamed: "gomoku_stone_black")
+        stone.name = "BlackStone"
         stone.size = CGSize(width: self.frame.width/20, height: self.frame.width/20)
         stone.position = convertGrid[Int(loc.x)][Int(loc.y)]
         grid[Int(loc.x)][Int(loc.y)] = 1
@@ -640,13 +645,13 @@ extension GameScene {
 //        print("stone added for white")
         if(checkWin(justPlaced: loc)) {
 //            print("white won!")
-            changeVictory(winner: "White")
+            changeVictory(winner: "Black")
         }
     }
     
     func addStoneBlack(loc: CGPoint) {
-        let stone = SKSpriteNode(imageNamed: "gomoku_stone_black")
-        stone.name = "BlackStone"
+        let stone = SKSpriteNode(imageNamed: "gomoku_stone_white")
+        stone.name = "WhiteStone"
         stone.size = CGSize(width: self.frame.width/20, height: self.frame.width/20)
         stone.position = convertGrid[Int(loc.x)][Int(loc.y)]
         grid[Int(loc.x)][Int(loc.y)] = 2
@@ -661,7 +666,7 @@ extension GameScene {
 //        print("stone added for black")
         if(checkWin(justPlaced: loc)) {
 //            print("black won!")
-            changeVictory(winner: "Black")
+            changeVictory(winner: "White")
         }
     }
     
